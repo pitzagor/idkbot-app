@@ -1,1 +1,1 @@
-web: python expandbot.py
+web: python3 expandbot.py
