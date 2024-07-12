@@ -9,9 +9,9 @@ app = Flask(__name__)
 g = Github(os.environ.get('GITHUB_TOKEN'))
 
 # Replace with your repository details
-REPO_OWNER = 'your-github-username'
-REPO_NAME = 'your-repo-name'
-FILE_PATH = 'abbreviations.txt'
+REPO_OWNER = 'pitzagor'
+REPO_NAME = 'idkbot-app'
+FILE_PATH = 'config/abbreviations.txt'
 
 def get_abbreviations():
     repo = g.get_repo(f"{REPO_OWNER}/{REPO_NAME}")
