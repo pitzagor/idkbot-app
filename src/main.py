@@ -1,44 +1,33 @@
 import os
-import requests
-from flask import Flask, request, jsonify
-from github import Github
+from slack_bolt import App
+from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-app = Flask(__name__)
+# Initialize the Slack app
+app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
-# Initialize GitHub client
-g = Github(os.environ.get('GITHUB_TOKEN'))
+# Load abbreviations from file
+def load_abbreviations(file_path):
+    abbreviations = {}
+    with open(file_path, 'r') as file:
+        for line in file:
+            parts = line.strip().split(' ', 1)
+            if len(parts) == 2:
+                abbreviations[parts[0].upper()] = parts[1]
+    return abbreviations
 
-# Replace with your repository details
-REPO_OWNER = 'pitzagor'
-REPO_NAME = 'idkbot-app'
-FILE_PATH = 'config/abbreviations.txt'
+# Load abbreviations
+abbreviations = load_abbreviations('config/abbreviations.txt')
 
-def get_abbreviations():
-    repo = g.get_repo(f"{REPO_OWNER}/{REPO_NAME}")
-    file_content = repo.get_contents(FILE_PATH).decoded_content.decode('utf-8')
-    return dict(line.strip().split(' ', 1) for line in file_content.splitlines())
-
-@app.route('/slack/events', methods=['POST'])
-def slack_events():
-    data = request.json
-    if data['type'] == 'url_verification':
-        return jsonify({'challenge': data['challenge']})
-    return '', 200
-
-@app.route('/slack/commands', methods=['POST'])
-def slack_command():
-    command_text = request.form['text'].upper()
-    abbreviations = get_abbreviations()
-    
-    if command_text in abbreviations:
-        response = f"{command_text}: {abbreviations[command_text]}"
+# Handle the /expandobot slash command
+@app.command("/expandobot")
+def handle_expandobot_command(ack, say, command):
+    ack()
+    query = command['text'].strip().upper()
+    if query in abbreviations:
+        say(f"{query}: {abbreviations[query]}")
     else:
-        response = f"Sorry, I couldn't find an expansion for '{command_text}'."
-    
-    return jsonify({
-        'response_type': 'in_channel',
-        'text': response
-    })
+        say(f"Sorry, I couldn't find an expansion for '{query}'.")
 
-if __name__ == '__main__':
-    app.run(port=3000)
+# Start your app
+if __name__ == "__main__":
+    SocketModeHandler(app, os.environ.get("SLACK_APP_TOKEN")).start()
