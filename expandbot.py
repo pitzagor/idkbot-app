@@ -1,8 +1,8 @@
 import os
+import logging
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
-from flask import Flask, request, jsonify
-import logging
+from flask import Flask, request, jsonify, abort
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -44,18 +44,37 @@ def handle_expandobot_command(ack, say, command):
     else:
         say(f"Sorry, I couldn't find an expansion for '{query}'.")
 
+# Catch-all event handler
+@app.event("*")
+def handle_all_events(event, logger):
+    logger.info(f"Received event: {event}")
+
+# Error handler
+@app.error
+def custom_error_handler(error, body, logger):
+    logger.exception(f"An error occurred: {error}")
+    logger.info(f"Request body: {body}")
+
 # Flask route for Slack events
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
-    logging.debug(f"Received request to /slack/events: {request.json}")
+    logging.debug(f"Received request to /slack/events")
+    logging.debug(f"Content-Type: {request.content_type}")
+    logging.debug(f"Request data: {request.get_data(as_text=True)}")
+
+    if request.content_type != 'application/json':
+        logging.warning(f"Unsupported Media Type: {request.content_type}")
+        abort(415, description="Unsupported Media Type. Expected application/json")
+
     # Check if this is a URL verification request
     if request.json and request.json.get("type") == "url_verification":
         logging.info("Handling URL verification request")
         # Respond with the challenge token
         return jsonify({"challenge": request.json["challenge"]})
+
     logging.info("Passing request to SlackRequestHandler")
     return handler.handle(request)
-    
+
 # Home route
 @flask_app.route("/", methods=["GET"])
 def home():
