@@ -37,3 +37,4 @@ ML Machine Learning
 UI User Interface
 UX User Experience
 CAPTCHA Completely Automated Public Turing test to tell Computers and Humans Apart
+WFT Go For a Walk
