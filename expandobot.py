@@ -45,16 +45,16 @@ if __name__ == "__main__":
         return ""
 
 # Home route
-@flask_app.route("/", methods=["GET"])
+@app.route("/", methods=["GET"])
 def home():
     return jsonify({"status": "ok", "message": "Expandobot is running!"})
 
 # Error handling
-@flask_app.errorhandler(404)
+@app.errorhandler(404)
 def not_found(error):
     return jsonify({"status": "error", "message": "Not found"}), 404
 
-@flask_app.errorhandler(500)
+@app.errorhandler(500)
 def internal_error(error):
     return jsonify({"status": "error", "message": "Internal server error"}), 500
 
