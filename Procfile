@@ -1,1 +1,1 @@
-worker: python expandobot.py
+web: python expandobot.py
