@@ -28,6 +28,7 @@ app = App(
 
 # Initialize Flask app
 flask_app = Flask(__name__)
+flask_app.url_map.strict_slashes = False
 handler = SlackRequestHandler(app)
 
 # Load abbreviations
@@ -46,13 +47,15 @@ def handle_expandobot_command(ack, say, command):
 # Flask route for Slack events
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
-    logging.debug(f"Received event: {request.json}")
+    logging.debug(f"Received request to /slack/events: {request.json}")
     # Check if this is a URL verification request
     if request.json and request.json.get("type") == "url_verification":
+        logging.info("Handling URL verification request")
         # Respond with the challenge token
         return jsonify({"challenge": request.json["challenge"]})
-    return handler.handle(request)    
-
+    logging.info("Passing request to SlackRequestHandler")
+    return handler.handle(request)
+    
 # Home route
 @flask_app.route("/", methods=["GET"])
 def home():
