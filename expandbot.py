@@ -28,7 +28,6 @@ app = App(
 
 # Initialize Flask app
 flask_app = Flask(__name__)
-flask_app.url_map.strict_slashes = False
 handler = SlackRequestHandler(app)
 
 # Load abbreviations
@@ -67,13 +66,19 @@ def slack_events():
         logging.info("Handling URL verification request")
         return jsonify({"challenge": request.json["challenge"]})
 
-    # Handle all other requests
-    try:
-        logging.info("Passing request to SlackRequestHandler")
-        return handler.handle(request)
-    except Exception as e:
-        logging.error(f"Error handling request: {str(e)}")
-        return jsonify({"error": "Internal server error"}), 500
+    # Handle slash commands (application/x-www-form-urlencoded)
+    if request.content_type == 'application/x-www-form-urlencoded':
+        logging.info("Handling slash command")
+        # Manually invoke the command handler
+        command = {k: v for k, v in request.form.items()}
+        return app.command(command.get('command', ''))(ack=lambda: None, respond=flask_respond, command=command)
+
+    # Handle other events (application/json)
+    logging.info("Handling other event")
+    return handler.handle(request)
+
+def flask_respond(message):
+    return jsonify(message)
 
 # Home route
 @flask_app.route("/", methods=["GET"])
