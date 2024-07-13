@@ -10,7 +10,7 @@ with open("abbreviations.txt", "r") as file:
         abbreviations[abbreviation.strip()] = expansion.strip()
 
 # Initialize the Slack client
-slack_token = os.environ["SLACK_API_TOKEN"]
+slack_token = os.environ["SLACK_BOT_TOKEN"]
 client = WebClient(token=slack_token)
 
 # Handle the slash command
