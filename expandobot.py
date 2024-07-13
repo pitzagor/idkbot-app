@@ -38,7 +38,29 @@ if __name__ == "__main__":
 
     app = Flask(__name__)
 
-@app.route('/slack/events', methods=['POST'])
+# @app.route('/slack/events', methods=['POST'])
+# def slack_events():
+#    logging.debug(f"Received request to /slack/events")
+#    logging.debug(f"Content-Type: {request.content_type}")
+#    logging.debug(f"Request data: {request.get_data(as_text=True)}")
+#
+#   # Handle URL verification
+#    if request.json and request.json.get("type") == "url_verification":
+#        logging.info("Handling URL verification request")
+#        return jsonify({"challenge": request.json["challenge"]})
+#
+#    # Handle slash commands (application/x-www-form-urlencoded)
+#    if request.form and request.form.get("command") == "/expandobot":
+#        logging.info("Handling /expandobot command")
+#        response_text = handle_expandobot_command(request.form)
+#        return jsonify({"response_type": "in_channel", "text": response_text})
+#
+#    # Handle other events (application/json)
+#    logging.info("Handling other event")
+#    return handler.handle(request)
+
+
+@app.route("/slack/events", methods=["POST"])
 def slack_events():
     logging.debug(f"Received request to /slack/events")
     logging.debug(f"Content-Type: {request.content_type}")
@@ -57,7 +79,7 @@ def slack_events():
 
     # Handle other events (application/json)
     logging.info("Handling other event")
-    return handler.handle(request)
+    return jsonify({"status": "ok"})
 
 # Home route
 @app.route("/", methods=["GET"])
