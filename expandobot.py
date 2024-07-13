@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     app = Flask(__name__)
 
-    @app.route("/slack/events", methods=["POST"])
+    @app.route("/slack/events", methods=["POST"], content_types=["application/json"])
     def slack_events():
         data = request.json
         if "challenge" in data:
