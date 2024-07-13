@@ -43,8 +43,8 @@ def slack_events():
     if request.json and request.json.get("type") == "url_verification":
         # Respond with the challenge token
         return jsonify({"challenge": request.json["challenge"]})
-
-    return handler.handle(request)    
+    else:
+        return handler.handle(request)    
 
 # Home route
 @flask_app.route("/", methods=["GET"])
