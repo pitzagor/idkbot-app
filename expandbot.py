@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-expandobot = Flask(__name__)
+app = Flask(__name__)
 
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 client = WebClient(token=SLACK_BOT_TOKEN)
