@@ -2,13 +2,10 @@ import os
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 from flask import Flask, request, jsonify
+import logging
 
-# Initialize the Slack app
-app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
-
-# Initialize Flask app
-flask_app = Flask(__name__)
-handler = SlackRequestHandler(app)
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
 
 # Load abbreviations from file
 def load_abbreviations(file_path):
@@ -20,12 +17,21 @@ def load_abbreviations(file_path):
                 if len(parts) == 2:
                     abbreviations[parts[0].upper()] = parts[1]
     except FileNotFoundError:
-        print(f"Warning: Abbreviations file not found at {file_path}")
+        logging.warning(f"Warning: Abbreviations file not found at {file_path}")
     return abbreviations
+
+# Initialize the Slack app
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
+
+# Initialize Flask app
+flask_app = Flask(__name__)
+handler = SlackRequestHandler(app)
 
 # Load abbreviations
 abbreviations = load_abbreviations('abbreviations.txt')
-
 
 # Handle the /expandobot slash command
 @app.command("/expandobot")
@@ -40,12 +46,12 @@ def handle_expandobot_command(ack, say, command):
 # Flask route for Slack events
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
+    logging.debug(f"Received event: {request.json}")
     # Check if this is a URL verification request
     if request.json and request.json.get("type") == "url_verification":
         # Respond with the challenge token
         return jsonify({"challenge": request.json["challenge"]})
-    else:
-        return handler.handle(request)    
+    return handler.handle(request)    
 
 # Home route
 @flask_app.route("/", methods=["GET"])
