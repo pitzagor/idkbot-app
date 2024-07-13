@@ -1,4 +1,5 @@
 import os
+import logging
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from flask import Flask, request, jsonify
@@ -13,6 +14,9 @@ with open("abbreviations.txt", "r") as file:
 # Initialize the Slack client
 slack_token = os.environ["SLACK_BOT_TOKEN"]
 client = WebClient(token=slack_token)
+
+# Initialize the Flask app
+app = Flask(__name__)
 
 # Handle the slash command
 def handle_command(command, channel):
