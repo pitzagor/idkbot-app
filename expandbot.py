@@ -24,7 +24,7 @@ def load_abbreviations(file_path):
     return abbreviations
 
 # Load abbreviations
-abbreviations = load_abbreviations('config/abbreviations.txt')
+abbreviations = load_abbreviations('abbreviations.txt')
 
 # Handle the /expandobot slash command
 @app.command("/expandobot")
