@@ -44,5 +44,5 @@ if __name__ == "__main__":
             handle_command(command, channel)
         return ""
 
-    if __name__ == "__main__":
-        app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True, port=int(os.environ.get("PORT", 5000)))
