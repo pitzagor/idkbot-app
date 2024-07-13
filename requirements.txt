@@ -1,2 +1,2 @@
-Flask
-slack-sdk
+slack-bolt==1.11.5
+slack-sdk==3.13.0
