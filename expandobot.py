@@ -1,6 +1,7 @@
 import os
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
+from slack_bolt.adapter.flask import SlackRequestHandler
+from flask import Flask, request
 
 # Load abbreviations from a file
 def load_abbreviations(file_path):
@@ -25,7 +26,14 @@ def handle_expandobot(ack, respond, command):
     expansion = abbreviations.get(abbreviation, "Abbreviation not found")
     respond(f"{abbreviation.upper()}: {expansion}")
 
+# Flask web server for Slack events
+flask_app = Flask(__name__)
+handler = SlackRequestHandler(app)
+
+@flask_app.route("/slack/events", methods=["POST"])
+def slack_events():
+    return handler.handle(request)
+
 # Start your app
 if __name__ == "__main__":
-    handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
-    handler.start()
+    flask_app.run(port=int(os.environ.get("PORT", 3000)))
