@@ -1,57 +1,54 @@
 import os
-import logging
-from slack_bolt import App
-from slack_bolt.adapter.flask import SlackRequestHandler
 from flask import Flask, request, jsonify
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
-# Set up logging
-logging.basicConfig(level=logging.DEBUG)
+app = Flask(__name__)
 
-# Load abbreviations from file
-def load_abbreviations(file_path):
+SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
+client = WebClient(token=SLACK_BOT_TOKEN)
+
+def load_abbreviations():
     abbreviations = {}
-    try:
-        with open(file_path, 'r') as file:
-            for line in file:
-                parts = line.strip().split(' ', 1)
-                if len(parts) == 2:
-                    abbreviations[parts[0].upper()] = parts[1]
-    except FileNotFoundError:
-        logging.warning(f"Warning: Abbreviations file not found at {file_path}")
+    with open("abbreviations.txt", "r") as file:
+        for line in file:
+            abbr, expansion = line.strip().split(" ", 1)
+            abbreviations[abbr.lower()] = expansion
     return abbreviations
 
-# Initialize the Slack app
-app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-)
+abbreviations = load_abbreviations()
 
-# Initialize Flask app
-flask_app = Flask(__name__)
-handler = SlackRequestHandler(app)
-
-# Load abbreviations
-abbreviations = load_abbreviations('abbreviations.txt')
-
-# Handle the /expandobot slash command
-@app.command("/expandobot")
-def handle_expandobot_command(ack, respond, command):
-    ack()
-    query = command['text'].strip().upper()
-    if query in abbreviations:
-        respond(f"{query}: {abbreviations[query]}")
-    else:
-        respond(f"Sorry, I couldn't find an expansion for '{query}'.")
-
-# Flask route for Slack events
-@flask_app.route("/slack/events", methods=["POST"])
+@app.route("/slack/events", methods=["POST"])
 def slack_events():
-    return handler.handle(request)
+    data = request.json
+    if "challenge" in data:
+        return jsonify({"challenge": data["challenge"]})
 
-# Home route
-@flask_app.route("/", methods=["GET"])
-def home():
-    return jsonify({"status": "ok", "message": "Expandobot is running!"})
+    if "event" in data:
+        event = data["event"]
+        if event["type"] == "app_mention":
+            handle_mention(event)
+
+    return jsonify({"status": "ok"})
+
+@app.route("/slack/commands", methods=["POST"])
+def slack_commands():
+    command = request.form.get("command")
+    text = request.form.get("text", "").lower()
+    channel_id = request.form.get("channel_id")
+
+    if command == "/expandobot":
+        if text in abbreviations:
+            response = f"{text.upper()}: {abbreviations[text]}"
+        else:
+            response = f"Sorry, I don't know the expansion for '{text}'."
+
+        try:
+            client.chat_postMessage(channel=channel_id, text=response)
+        except SlackApiError as e:
+            print(f"Error posting message: {e}")
+
+    return jsonify({"response_type": "in_channel"})
 
 if __name__ == "__main__":
-    flask_app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
