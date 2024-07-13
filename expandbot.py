@@ -2,7 +2,7 @@ import os
 import logging
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -67,19 +67,13 @@ def slack_events():
         logging.info("Handling URL verification request")
         return jsonify({"challenge": request.json["challenge"]})
 
-    # Handle slash commands (application/x-www-form-urlencoded)
-    if request.content_type == 'application/x-www-form-urlencoded':
-        logging.info("Handling slash command")
+    # Handle all other requests
+    try:
+        logging.info("Passing request to SlackRequestHandler")
         return handler.handle(request)
-
-    # Handle other events (application/json)
-    if request.content_type == 'application/json':
-        logging.info("Handling JSON event")
-        return handler.handle(request)
-
-    # If we get here, it's an unsupported content type
-    logging.warning(f"Unsupported Media Type: {request.content_type}")
-    abort(415, description="Unsupported Media Type")
+    except Exception as e:
+        logging.error(f"Error handling request: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
 
 # Home route
 @flask_app.route("/", methods=["GET"])
