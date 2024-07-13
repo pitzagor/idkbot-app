@@ -15,7 +15,7 @@ def load_abbreviations(file_path):
 # Initialize the Slack app
 app = App(
     token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_APP_TOKEN")
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
 # Load the abbreviations
