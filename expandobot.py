@@ -13,7 +13,10 @@ def load_abbreviations(file_path):
     return abbreviations
 
 # Initialize the Slack app
-app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_APP_TOKEN")
+)
 
 # Load the abbreviations
 abbreviations = load_abbreviations('abbreviations.txt')
