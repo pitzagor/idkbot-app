@@ -6,7 +6,7 @@ from slack_sdk.errors import SlackApiError
 abbreviations = {}
 with open("abbreviations.txt", "r") as file:
     for line in file:
-        abbreviation, expansion = line.strip().split(":")
+        abbreviation, expansion = line.strip().split(" ", 1)
         abbreviations[abbreviation.strip()] = expansion.strip()
 
 # Initialize the Slack client
