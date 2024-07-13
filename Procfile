@@ -1,1 +1,1 @@
-web: gunicorn expandobot:app
+web: gunicorn expandbot:app
