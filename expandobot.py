@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     app = Flask(__name__)
 
-@app.route("/slack/events", methods=["POST"], content_type="application/json")
+@app.route('/slack/events', methods=['POST'])
 def slack_events():
     logging.debug(f"Received request to /slack/events")
     logging.debug(f"Content-Type: {request.content_type}")
