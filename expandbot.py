@@ -10,9 +10,6 @@ app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 flask_app = Flask(__name__)
 handler = SlackRequestHandler(app)
 
-# Load abbreviations
-abbreviations = load_abbreviations('abbreviations.txt')
-
 # Load abbreviations from file
 def load_abbreviations(file_path):
     abbreviations = {}
@@ -25,6 +22,9 @@ def load_abbreviations(file_path):
     except FileNotFoundError:
         print(f"Warning: Abbreviations file not found at {file_path}")
     return abbreviations
+
+# Load abbreviations
+abbreviations = load_abbreviations('abbreviations.txt')
 
 
 # Handle the /expandobot slash command
