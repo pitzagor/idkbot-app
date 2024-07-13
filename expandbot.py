@@ -39,8 +39,11 @@ def handle_expandobot_command(ack, say, command):
 # Flask route for Slack events
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
-    return handler.handle(request)
-
+    # Check if this is a URL verification request
+    if request.json and request.json.get("type") == "url_verification":
+        # Respond with the challenge token
+        return jsonify({"challenge": request.json["challenge"]})
+    
 # Home route
 @flask_app.route("/", methods=["GET"])
 def home():
