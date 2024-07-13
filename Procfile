@@ -1,1 +1,1 @@
-web: python  expandbot.py
+web: gunicorn app:idkbot-app
