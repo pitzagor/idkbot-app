@@ -44,5 +44,23 @@ if __name__ == "__main__":
             handle_command(command, channel)
         return ""
 
+# Home route
+@flask_app.route("/", methods=["GET"])
+def home():
+    return jsonify({"status": "ok", "message": "Expandobot is running!"})
+
+# Error handling
+@flask_app.errorhandler(404)
+def not_found(error):
+    return jsonify({"status": "error", "message": "Not found"}), 404
+
+@flask_app.errorhandler(500)
+def internal_error(error):
+    return jsonify({"status": "error", "message": "Internal server error"}), 500
+
 if __name__ == "__main__":
-    app.run(debug=True, port=int(os.environ.get("PORT", 5000)))
+    # Get port from environment variable or default to 5000
+    port = int(os.environ.get("PORT", 5000))
+
+    # Start the Flask app
+    flask_app.run(host="0.0.0.0", port=port)
