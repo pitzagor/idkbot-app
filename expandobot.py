@@ -21,8 +21,8 @@ app = App(
 # Load the abbreviations
 abbreviations = load_abbreviations('abbreviations.txt')
 
-# Command handler for /expandobot
-@app.command("/expandobot")
+# Command handler for /expandbot
+@app.command("/expandbot")
 def handle_expandobot(ack, respond, command):
     ack()
     abbreviation = command['text'].strip().lower()
