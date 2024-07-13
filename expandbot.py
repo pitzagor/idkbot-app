@@ -3,6 +3,8 @@ import logging
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 from flask import Flask, request, jsonify
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -20,11 +22,12 @@ def load_abbreviations(file_path):
         logging.warning(f"Warning: Abbreviations file not found at {file_path}")
     return abbreviations
 
-# Initialize the Slack app
-app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-)
+# Initialize the Slack app and client
+slack_bot_token = os.environ.get("SLACK_BOT_TOKEN")
+slack_signing_secret = os.environ.get("SLACK_SIGNING_SECRET")
+
+app = App(token=slack_bot_token, signing_secret=slack_signing_secret)
+client = WebClient(token=slack_bot_token)
 
 # Initialize Flask app
 flask_app = Flask(__name__)
@@ -34,14 +37,12 @@ handler = SlackRequestHandler(app)
 abbreviations = load_abbreviations('abbreviations.txt')
 
 # Handle the /expandobot slash command
-@app.command("/expandobot")
-def handle_expandobot_command(ack, respond, command):
-    ack()
+def handle_expandobot_command(command):
     query = command['text'].strip().upper()
     if query in abbreviations:
-        respond(f"{query}: {abbreviations[query]}")
+        return f"{query}: {abbreviations[query]}"
     else:
-        respond(f"Sorry, I couldn't find an expansion for '{query}'.")
+        return f"Sorry, I couldn't find an expansion for '{query}'."
 
 # Catch-all event handler
 @app.event("*")
@@ -67,18 +68,14 @@ def slack_events():
         return jsonify({"challenge": request.json["challenge"]})
 
     # Handle slash commands (application/x-www-form-urlencoded)
-    if request.content_type == 'application/x-www-form-urlencoded':
-        logging.info("Handling slash command")
-        # Manually invoke the command handler
-        command = {k: v for k, v in request.form.items()}
-        return app.command(command.get('command', ''))(ack=lambda: None, respond=flask_respond, command=command)
+    if request.form and request.form.get("command") == "/expandobot":
+        logging.info("Handling /expandobot command")
+        response_text = handle_expandobot_command(request.form)
+        return jsonify({"response_type": "in_channel", "text": response_text})
 
     # Handle other events (application/json)
     logging.info("Handling other event")
     return handler.handle(request)
-
-def flask_respond(message):
-    return jsonify(message)
 
 # Home route
 @flask_app.route("/", methods=["GET"])
