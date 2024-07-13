@@ -36,13 +36,13 @@ abbreviations = load_abbreviations('abbreviations.txt')
 
 # Handle the /expandobot slash command
 @app.command("/expandobot")
-def handle_expandobot_command(ack, say, command):
+def handle_expandobot_command(ack, respond, command):
     ack()
     query = command['text'].strip().upper()
     if query in abbreviations:
-        say(f"{query}: {abbreviations[query]}")
+        respond(f"{query}: {abbreviations[query]}")
     else:
-        say(f"Sorry, I couldn't find an expansion for '{query}'.")
+        respond(f"Sorry, I couldn't find an expansion for '{query}'.")
 
 # Catch-all event handler
 @app.event("*")
@@ -62,18 +62,24 @@ def slack_events():
     logging.debug(f"Content-Type: {request.content_type}")
     logging.debug(f"Request data: {request.get_data(as_text=True)}")
 
-    if request.content_type != 'application/json':
-        logging.warning(f"Unsupported Media Type: {request.content_type}")
-        abort(415, description="Unsupported Media Type. Expected application/json")
-
-    # Check if this is a URL verification request
+    # Handle URL verification
     if request.json and request.json.get("type") == "url_verification":
         logging.info("Handling URL verification request")
-        # Respond with the challenge token
         return jsonify({"challenge": request.json["challenge"]})
 
-    logging.info("Passing request to SlackRequestHandler")
-    return handler.handle(request)
+    # Handle slash commands (application/x-www-form-urlencoded)
+    if request.content_type == 'application/x-www-form-urlencoded':
+        logging.info("Handling slash command")
+        return handler.handle(request)
+
+    # Handle other events (application/json)
+    if request.content_type == 'application/json':
+        logging.info("Handling JSON event")
+        return handler.handle(request)
+
+    # If we get here, it's an unsupported content type
+    logging.warning(f"Unsupported Media Type: {request.content_type}")
+    abort(415, description="Unsupported Media Type")
 
 # Home route
 @flask_app.route("/", methods=["GET"])
