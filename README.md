@@ -44,7 +44,7 @@ pip install -r requirements.txt
 ```
 SLACK_BOT_TOKEN=your-bot-token
 SLACK_SIGNING_SECRET=your-signing-secret
-ORT=3000
+PORT=3000
 ```
    
 **) Replace `your-bot-token` and `your-signing-secret` with the respective values from your Slack app.
