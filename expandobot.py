@@ -28,7 +28,7 @@ def handle_expandobot(ack, respond, command):
     abbreviation = command['text'].strip().lower()
 
     if not abbreviation:
-        respond("Please provide an abbreviation as an argument."
+        respond("Please provide an abbreviation as an argument.")
         return
 
     expansion = abbreviations.get(abbreviation)
