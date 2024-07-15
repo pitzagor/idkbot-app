@@ -46,22 +46,21 @@ SLACK_BOT_TOKEN=your-bot-token
 SLACK_SIGNING_SECRET=your-signing-secret
 ORT=3000
 ```
-        
+   
+**) Replace `your-bot-token` and `your-signing-secret` with the respective values from your Slack app.
     
-    **) Replace `your-bot-token` and `your-signing-secret` with the respective values from your Slack app.
-    
-    5. Load abbreviations:
-    
-      - Create a file named `abbreviations.txt` in the project root directory.
-      - Add abbreviations and their expansions in the following format:
-       
-        ```
-        abbr1 expansion1
-        abbr2 expansion2
-        ...
-        ```
-    
-    6. Run the app:
+5. Load abbreviations:
+
+- Create a file named `abbreviations.txt` in the project root directory.
+- Add abbreviations and their expansions in the following format:
+
+```
+abbr1 expansion1
+abbr2 expansion2
+...
+```
+
+6. Run the app:
     
 ```bash
 python app.py
