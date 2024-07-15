@@ -26,7 +26,16 @@ abbreviations = load_abbreviations('abbreviations.txt')
 def handle_expandobot(ack, respond, command):
     ack()
     abbreviation = command['text'].strip().lower()
-    expansion = abbreviations.get(abbreviation, "Abbreviation not found")
+
+    if not abbreviation:
+        respond("Please provide an abbreviation as an argument."
+        return
+
+    expansion = abbreviations.get(abbreviation)
+
+    if not expansion:
+        respond(f"No expansion found for abbreviation: {abbreviation.upper()}")
+    
     respond(f"{abbreviation.upper()}: {expansion}")
 
 # Flask web server for Slack events
