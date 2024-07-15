@@ -36,5 +36,6 @@ AI Artificial Intelligence
 ML Machine Learning
 UI User Interface
 UX User Experience
+BGP Border Gateway Protocol
 CAPTCHA Completely Automated Public Turing test to tell Computers and Humans Apart
 WFT Go For a Walk
