@@ -4,7 +4,7 @@ You know this feeling, right? Every conversation, every document seems to be fil
 
 We have to navigate through countless Confluence pages and internal documents, juggling between them to piece together the puzzle. It is a journey of patience and persistence, and.... total wast of time :) 
 
-**ExpandBot **is a Slack bot that comes as a result of that frustrations. It just expands abbreviations. It takes an abbreviation as input and returns its expansion. It uses simple text file in the background. You find a new abbreviation - add it to the file and update the GitHub repo! 
+**ExpandBot** is a Slack bot that comes as a result of that frustrations. It just expands abbreviations. It takes an abbreviation as input and returns its expansion. It uses simple text file in the background. You find a new abbreviation - add it to the file and update the GitHub repo! 
 
 ## The best practices 
 
@@ -15,18 +15,20 @@ This practice ensures clarity and avoids confusion for readers who may not be fa
 ## Installation
 
 1. Clone the repository:
-    
-        bash
-    
-    git clone https://github.com/your-username/expandbot.git
 
-2. Install the required dependencies:
-    
-        bash
-    
-    pip install -r requirements.txt
+```
+bash
+git clone https://github.com/your-username/expandbot.git
+```
 
-3. up the Slack app:
+4. Install the required dependencies:
+
+```
+bash
+pip install -r requirements.txt
+```
+
+5. up the Slack app:
 
     - Create a new Slack app in your Slack workspace.
     - Enable the "Interactivity & Shortcuts" feature and set the Request URL to your server's URL (e.g., **https://your-server.com/slack/events**).
@@ -34,23 +36,25 @@ This practice ensures clarity and avoids confusion for readers who may not be fa
         - Command: **/expandbot**
         - Request URL: **https://your-server.com/slack/events**
     - Install the app to your workspace and note down the Bot Token and Signing Secret.
-4. Set up environment variables:
+6. Set up environment variables:
 
     - Create a **.env** file in the project root directory.
     - Add the following environment variables to the **.env** file:
+
+```
+SLACK_BOT_TOKEN=your-bot-token
+SLACK_SIGNING_SECRET=your-signing-secret
+ORT=3000
+```
         
-                **SLACK_BOT_TOKEN=your-bot-token
-        SLACK_SIGNING_SECRET=your-signing-secret
-        PORT=3000
-        **
     
-    
-    **    Replace `your-bot-token` and `your-signing-secret` with the respective values from your Slack app.
+    **) Replace `your-bot-token` and `your-signing-secret` with the respective values from your Slack app.
     
     5. Load abbreviations:
     
       - Create a file named `abbreviations.txt` in the project root directory.
       - Add abbreviations and their expansions in the following format:
+       
         ```
         abbr1 expansion1
         abbr2 expansion2
@@ -59,9 +63,10 @@ This practice ensures clarity and avoids confusion for readers who may not be fa
     
     6. Run the app:
     
-      ```bash
-      python app.py
-    **
+```bash
+python app.py
+```
+
 
 ## Usage
 
