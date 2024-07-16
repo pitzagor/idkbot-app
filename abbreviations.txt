@@ -1,6 +1,7 @@
 HTTP Hypertext Transfer Protocol
 HTTPS Hypertext Transfer Protocol Secure
 IP Internet Protocol
+IP Intelectual Property
 TCP Transmission Control Protocol
 UDP User Datagram Protocol
 DNS Domain Name System
